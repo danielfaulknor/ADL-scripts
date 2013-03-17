@@ -38,16 +38,20 @@ do
 
 	# Create a folder for the current date to keep things tidy if it doesn't already exist
 	[ -d /media/data/new/`date +%F` ] || mkdir /media/data/new/`date +%F`
-
-	# Touch an empty file to indicate the directory is still being copied
-	[ -d /media/data/new/`date +%F`/$dir ] || mkdir /media/data/new/`date +%F`/$dir
-	touch /media/data/new/`date +%F`/$dir/copying
+	
+	#Check this is a directory, otherwise don't create it, will break single file downloads.
+	if [ -d ~/downloads/torrents-complete/$dir ]
+        then
+			# Touch an empty file to indicate the directory is still being copied
+			[ -d /media/data/new/`date +%F`/$dir ] || mkdir /media/data/new/`date +%F`/$dir
+			touch /media/data/new/`date +%F`/$dir/copying
+		fi
 
 	# Move the files
 	rsync -avz --progress --remove-source-files ~/downloads/torrents-complete/$dir /media/data/new/`date +%F`/
 
-	# Clear the copying flag
-	rm /media/data/new/`date +%F`/$dir/copying
+	# Clear the copying flag if it exists.
+	if [ -f /media/data/new/`date +%F`/$dir/copying ] || rm /media/data/new/`date +%F`/$dir/copying
 
 done
 
